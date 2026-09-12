@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ByteWeave Studio | Software that Thinks</title>
+    <meta name="description" content="ByteWeave Studio builds production-grade software using computer vision, document intelligence, LLMs and modern engineering. AI systems engineered for the real world." />
+    <link rel="canonical" href="https://byteweave.studio/" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="theme-color" content="#f7f7f5" />
+    <meta name="color-scheme" content="light" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ByteWeave Studio" />
+    <meta property="og:title" content="ByteWeave Studio — Software that Thinks" />
+    <meta property="og:description" content="AI systems engineered for the real world. Computer vision, document intelligence, LLMs and the production software around them." />
+    <meta property="og:url" content="https://byteweave.studio/" />
+    <meta property="og:image" content="https://byteweave.studio/og/og-default.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ByteWeave Studio — Software that Thinks" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ByteWeave Studio — Software that Thinks" />
+    <meta name="twitter:description" content="AI systems engineered for the real world. Computer vision, document intelligence, LLMs and the production software around them." />
+    <meta name="twitter:image" content="https://byteweave.studio/og/og-default.png" />
+    <meta name="twitter:image:alt" content="ByteWeave Studio — Software that Thinks" />
+
+    <link rel="alternate" type="application/rss+xml" title="ByteWeave Studio — Writing" href="/rss.xml" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!-- Self-hosted, latin-only. Preloaded because the display face is the LCP element. -->
+    <link
+      rel="preload"
+      href="/fonts/geist-latin-var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- The Organization node lives here so it is on every page. Everything
+         src/seo.ts emits — every author, publisher and provider — points at
+         this @id, so it has to be declared, not just described. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "@id": "https://byteweave.studio/#organization",
+        "name": "ByteWeave Studio",
+        "alternateName": "ByteWeave",
+        "url": "https://byteweave.studio/",
+        "logo": {
+          "@type": "ImageObject",
+          "@id": "https://byteweave.studio/#logo",
+          "url": "https://byteweave.studio/icon-512.png",
+          "contentUrl": "https://byteweave.studio/icon-512.png",
+          "width": 512,
+          "height": 512,
+          "caption": "ByteWeave Studio"
+        },
+        "image": { "@id": "https://byteweave.studio/#logo" },
+        "email": "hello@byteweave.studio",
+        "description": "AI engineering and software development studio building production systems with computer vision, document intelligence and LLMs.",
+        "slogan": "Software that Thinks.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Bengaluru",
+          "addressCountry": "IN"
+        },
+        "areaServed": "Worldwide",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "sales",
+          "email": "hello@byteweave.studio",
+          "url": "https://byteweave.studio/contact",
+          "availableLanguage": ["en"],
+          "areaServed": "Worldwide"
+        },
+        "knowsAbout": [
+          "Computer vision",
+          "Document intelligence",
+          "Optical character recognition",
+          "Large language models",
+          "Retrieval-augmented generation",
+          "Model Context Protocol",
+          "Video analytics",
+          "Full-stack web development",
+          "Mobile application development"
+        ],
+        "sameAs": [
+          "https://www.linkedin.com/company/byteweave-studio",
+          "https://www.instagram.com/byteweave.studio"
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <script>document.documentElement.classList.add('js')</script>
+    <div id="root"><!--app-html--></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

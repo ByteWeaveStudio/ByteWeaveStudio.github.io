@@ -1,0 +1,116 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Allow one concurrent deployment; let an in-progress run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Type-checks, builds the client, builds the SSR bundle, then prerenders
+      # the homepage into dist/index.html.
+      - run: pnpm build
+
+      # The custom domain and the Jekyll opt-out must survive the build, or
+      # Pages drops byteweave.studio and strips underscore-prefixed assets.
+      - name: Verify deploy artifacts
+        run: |
+          test -f dist/CNAME     || { echo "::error::dist/CNAME missing"; exit 1; }
+          test -f dist/.nojekyll || { echo "::error::dist/.nojekyll missing"; exit 1; }
+          test -f dist/404.html  || { echo "::error::dist/404.html missing"; exit 1; }
+
+          # Every route must have been prerendered to its own directory with
+          # its own <title>, or the SEO story is broken for that page.
+          for route in "" case-studies products blog about \
+                       case-studies/invoice-extraction \
+                       case-studies/netra3-store-monitoring \
+                       case-studies/student-management-portal \
+                       blog/what-is-mcp-model-context-protocol \
+                       blog/invoice-ocr-fails-in-production; do
+            f="dist/${route:+$route/}index.html"
+            test -f "$f" || { echo "::error::missing $f"; exit 1; }
+            grep -q "<title>" "$f" || { echo "::error::$f has no title"; exit 1; }
+            grep -q "byteweave.studio" "$f" || { echo "::error::$f has no canonical"; exit 1; }
+          done
+
+          # Distinct titles prove per-route metadata was applied, not copied.
+          titles=$(grep -ho "<title>[^<]*</title>" $(find dist -name index.html) | sort -u | wc -l)
+          test "$titles" -ge 20 || { echo "::error::only $titles distinct titles"; exit 1; }
+
+          # Every blog post must be its own prerendered page with BlogPosting.
+          count=$(find dist/blog -mindepth 1 -maxdepth 1 -type d | wc -l)
+          test "$count" -ge 15 || { echo "::error::only $count blog posts built"; exit 1; }
+          for f in dist/blog/*/index.html; do
+            grep -q "BlogPosting" "$f" || { echo "::error::$f has no BlogPosting"; exit 1; }
+          done
+
+          grep -q "Software" dist/index.html \
+            || { echo "::error::prerender produced no app HTML"; exit 1; }
+
+          # Structured data and the LLM crawler files are part of the artifact.
+          test -s dist/llms.txt      || { echo "::error::dist/llms.txt missing"; exit 1; }
+          test -s dist/llms-full.txt || { echo "::error::dist/llms-full.txt missing"; exit 1; }
+          for route in case-studies/invoice-extraction \
+                       case-studies/netra3-store-monitoring \
+                       case-studies/student-management-portal; do
+            f="dist/$route/index.html"
+            grep -q "TechArticle" "$f" || { echo "::error::$f has no TechArticle"; exit 1; }
+            grep -q "FAQPage"     "$f" || { echo "::error::$f has no FAQPage"; exit 1; }
+          done
+          # Every ld+json block must be parseable, or rich results silently vanish.
+          python3 - <<'PY'
+          import json, re, sys, pathlib
+          bad = []
+          for f in pathlib.Path('dist').rglob('index.html'):
+              for b in re.findall(r'<script type="application/ld\+json">(.*?)</script>',
+                                  f.read_text(), re.S):
+                  try:
+                      json.loads(b)
+                  except Exception as e:
+                      bad.append(f"{f}: {e}")
+          if bad:
+              print("::error::malformed JSON-LD -> " + "; ".join(bad)); sys.exit(1)
+          print("JSON-LD OK")
+          PY
+          echo "CNAME: $(cat dist/CNAME)"
+          echo "routes verified: $titles distinct titles"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

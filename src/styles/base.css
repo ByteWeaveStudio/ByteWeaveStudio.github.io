@@ -1,0 +1,176 @@
+@layer base {
+  html {
+    /* The design reads best at what a browser calls 110% zoom, so that is
+       baked in as the default. A percentage keeps it proportional to whatever
+       base size the reader has configured, rather than overriding it.
+       Everything downstream is rem-based, so type, spacing, the container and
+       the gutters all follow. The vw terms in the type clamps are scaled by
+       the same factor in tokens.css, since those do not track root font-size. */
+    font-size: 110%;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  /* Lenis drives scrolling when it is active; native smooth would fight it. */
+  html.lenis { scroll-behavior: auto; }
+  html.lenis body { min-height: 100%; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headline scale is applied explicitly per element; reset the UA defaults
+     so an <h2> never silently inherits browser sizing. */
+  h1, h2, h3, h4, h5, h6 {
+    font-size: inherit;
+    font-weight: inherit;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+
+  /* Anchor nav must not drop section headings under the fixed header. */
+  :target { scroll-margin-top: calc(var(--nav-h) + 2rem); }
+  [id] { scroll-margin-top: calc(var(--nav-h) + 2rem); }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-white);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+  /* Only suppress the ring for genuine pointer interaction. */
+  :focus:not(:focus-visible) { outline: none; }
+
+  svg { display: block; }
+  img, video { max-width: 100%; height: auto; }
+}
+
+/* One global escape hatch. Components still branch on useReducedMotion()
+   for JS-driven animation; this catches everything CSS-driven. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hero entrance. Runs once, on load — the only thing on the page that
+   animates without being scrolled to. */
+@keyframes line-rise {
+  from { transform: translateY(105%); }
+  to   { transform: translateY(0); }
+}
+@keyframes fade-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+@utility animate-line-rise {
+  animation: line-rise 900ms var(--ease-out) both;
+}
+@utility animate-fade-rise {
+  animation: fade-rise 700ms var(--ease-out) both;
+}
+
+/* Capability "Think" diagram: the illuminated route strokes in on hover. */
+.group:hover [stroke-dashoffset] { stroke-dashoffset: 0; }
+
+/* ── Reveal ───────────────────────────────────────────────────────────────
+   Hidden state is gated on html.js (set by an inline script in index.html)
+   so the prerendered page is fully readable with JavaScript disabled, and is
+   dropped entirely under reduced motion. */
+.reveal {
+  transition:
+    opacity 900ms var(--ease-out),
+    transform 900ms var(--ease-out);
+}
+html.js .reveal[data-reveal='out'] {
+  opacity: 0;
+  transform: translateY(var(--reveal-distance, 12px));
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal[data-reveal='out'] {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Cards in a row are always equal height ───────────────────────────────
+   House rule: whenever cards sit side by side — work, case studies, blog,
+   anywhere — their heights match. A grid item stretches by default, but any
+   wrapper between it and the card (a <Reveal>, say) is auto-height and breaks
+   the chain, so the card's own h-full resolves against nothing. This carries
+   the full height down through the wrappers. Put `card-grid` on the grid. */
+@utility card-grid {
+  & > * {
+    height: 100%;
+  }
+  & > * > * {
+    height: 100%;
+  }
+}
+
+/* ── Stacked section cards ────────────────────────────────────────────────
+   Each section overlaps the one before it with a rounded top edge and a soft
+   shadow, so it reads as sliding up over it. Deliberately not a pinned card
+   stack: half the homepage sections are taller than a viewport, and pinning
+   those would cover text before it had been read.
+
+   The overlap alone works everywhere. Browsers with scroll-driven animations
+   also recede the outgoing card — that is what sells the depth — and the
+   effect simply does not apply anywhere else. */
+@utility stack-card {
+  position: relative;
+  border-top-left-radius: var(--card-round);
+  border-top-right-radius: var(--card-round);
+  margin-top: calc(var(--card-overlap) * -1);
+  box-shadow:
+    0 -1px 0 0 rgb(17 17 17 / 0.05),
+    0 -18px 40px -22px rgb(17 17 17 / 0.22);
+}
+
+:root {
+  --card-round: 2rem;
+  --card-overlap: 2.5rem;
+}
+
+/* The base of the stack keeps a square top — nothing sits behind it. */
+.stack-base {
+  position: relative;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .stack-card,
+    .stack-base {
+      animation: card-sink linear both;
+      animation-timeline: view();
+      /* Tied to the element leaving the viewport, so the effect peaks while
+         the seam between the two cards is actually on screen. */
+      animation-range: exit 0% exit 100%;
+      transform-origin: 50% 100%;
+    }
+  }
+}
+
+/* The outgoing card lags the scroll and settles back, so the next one appears
+   to climb over it rather than simply following it up the page. */
+@keyframes card-sink {
+  to {
+    transform: translateY(9vh) scale(0.93);
+  }
+}

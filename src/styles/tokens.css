@@ -1,0 +1,116 @@
+/* ─────────────────────────────────────────────────────────────
+   ByteWeave design tokens
+   Accent is #1F48FF — measured from the logo artwork, NOT the
+   #4928FD left over in the old Bootstrap template.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  /* Clear Tailwind's stock palette: only brand colours are reachable. */
+  --color-*: initial;
+
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-bg: #f7f7f5;          /* warm off-white base           */
+  --color-raised: #ffffff;      /* cards lifted off the base     */
+  --color-sunk: #f0f0ed;        /* alternating section bands     */
+
+  --color-ink: #111111;
+  --color-ink-secondary: #6b6b6b;
+  --color-ink-tertiary: #9a9a96;
+
+  --color-line: #e5e5e5;
+  --color-line-strong: #d6d6d2;
+
+  --color-accent: #1f48ff;
+
+  /* The logo's own ramp, sampled from the artwork. Used as a system —
+     the Method rule, the hero wash, the woven threads — rather than sprayed
+     across surfaces. */
+  --color-grad-from: #5170fe;
+  --color-grad-via: #8e6cea;
+  --color-grad-to: #f568c7;
+
+  /* Carried over from the old site's signature hero wash
+     (#D9F3FC → #FFF → #FDF1D3), desaturated so type stays AA on top. */
+  --color-tint-cool: #eff6fa;
+  --color-tint-warm: #faf6ec;
+  --color-accent-hover: #1739d6;
+  --color-accent-wash: #f0f3ff;
+
+  /* The base accent is only 3.15:1 on --dark; this lifted tint is 4.80:1. */
+  --color-accent-on-dark: #4f73ff;
+
+  --color-dark: #0e0e10;        /* Technical Depth + Final CTA   */
+  --color-dark-raised: #17171a;
+  --color-dark-line: #26262a;
+  --color-dark-ink: #f4f4f2;
+  --color-dark-ink-secondary: #8b8b90;
+
+  /* ── Type ── */
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, Cambria, serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.2;
+  --text-eyebrow--letter-spacing: 0.12em;
+  --text-eyebrow--font-weight: 500;
+
+  --text-caption: 0.8125rem;
+  --text-caption--line-height: 1.5;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.65;
+
+  --text-body-l: 1.125rem;
+  --text-body-l--line-height: 1.6;
+
+  --text-h3: clamp(1.25rem, 1.76vw, 1.5rem);
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.015em;
+
+  --text-h2: clamp(2rem, 3.96vw, 3.25rem);
+  --text-h2--line-height: 1.02;
+  --text-h2--letter-spacing: -0.025em;
+
+  --text-display-l: clamp(2.5rem, 6.05vw, 4.5rem);
+  --text-display-l--line-height: 0.95;
+  --text-display-l--letter-spacing: -0.03em;
+
+  --text-display-xl: clamp(3rem, 9.35vw, 8rem);
+  --text-display-xl--line-height: 0.9;
+  --text-display-xl--letter-spacing: -0.035em;
+
+  /* ── Section rhythm ── */
+  --spacing-section-sm: 6rem;    /*  96px */
+  --spacing-section: 8rem;       /* 128px */
+  --spacing-section-lg: 10rem;   /* 160px */
+  --spacing-section-xl: 12.5rem; /* 200px */
+
+  /* ── Radius: deliberately tighter than the old pill-everything look ── */
+  --radius-input: 4px;
+  --radius-card: 8px;
+  --radius-panel: 12px;
+
+  /* ── Elevation: borders do the work. Exactly one shadow. ── */
+  --shadow-lift: 0 1px 2px rgb(17 17 17 / 0.04), 0 8px 24px -12px rgb(17 17 17 / 0.1);
+
+  /* ── Motion ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --container-page: 80rem; /* 1280px */
+}
+
+/* Container query / layout helpers Tailwind can't express as tokens. */
+:root {
+  --gutter: 1.5rem;
+  --nav-h: 5.5rem;
+}
+@media (min-width: 48rem) {
+  :root { --gutter: 2.5rem; }
+}
+@media (min-width: 80rem) {
+  :root { --gutter: 4rem; }
+}
